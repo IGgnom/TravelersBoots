@@ -56,8 +56,7 @@ public class TravelersBootsItem extends ArmorItem {
     }
 
     public void onLivingFall(LivingFallEvent event) {
-        LivingEntity livingEntity = event.getEntity();
-        if (isWornBy(livingEntity)) {
+        if (isWornBy(event.getEntity())) {
             if (event.getDistance() <= 5f)
                 event.setDamageMultiplier(0f);
             else

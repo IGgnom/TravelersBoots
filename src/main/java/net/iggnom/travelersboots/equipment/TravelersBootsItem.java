@@ -21,6 +21,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -30,7 +31,7 @@ import java.util.UUID;
 
 public class TravelersBootsItem extends ArmorItem {
     public TravelersBootsItem(ArmorMaterial material, Properties properties) {
-        super(material, EquipmentSlot.FEET, properties);
+        super(material, Type.BOOTS, properties);
         MinecraftForge.EVENT_BUS.addListener(this::onLivingJump);
         MinecraftForge.EVENT_BUS.addListener(this::onLivingFall);
         MinecraftForge.EVENT_BUS.addListener(this::onPlayerTick);
@@ -40,9 +41,9 @@ public class TravelersBootsItem extends ArmorItem {
         if (isWornBy(event.player)) {
             float speedModifier = 0f;
             if (event.player.isSprinting())
-                speedModifier = event.player.isOnGround() ? 0.031f : 0.012f;
+                speedModifier = event.player.onGround() ? 0.031f : 0.012f;
             else if (event.player.zza > 0f)
-                speedModifier = event.player.isOnGround() ? 0.03f : 0.015f;
+                speedModifier = event.player.onGround() ? 0.03f : 0.015f;
             speedModifier /= event.player.isInWater() ? 4f : 1f;
             float rotation = Mth.PI / 180f * event.player.getYRot();
             event.player.setDeltaMovement(event.player.getDeltaMovement().add(-Mth.sin(rotation) * speedModifier, 0f, Mth.cos(rotation) * speedModifier));
@@ -85,7 +86,7 @@ public class TravelersBootsItem extends ArmorItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(@NotNull ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.translatable("tooltip.travelersboots.travelers_boots.tooltip").withStyle(ChatFormatting.GOLD));
         super.appendHoverText(stack, level, tooltipComponents, tooltipFlag);
     }

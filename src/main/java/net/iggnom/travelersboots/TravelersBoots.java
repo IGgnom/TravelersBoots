@@ -2,21 +2,17 @@ package net.iggnom.travelersboots;
 
 import net.iggnom.travelersboots.item.ModItem;
 import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 
 @Mod(TravelersBoots.MOD_ID)
 public class TravelersBoots {
     public static final String MOD_ID = "travelersboots";
 
-    public TravelersBoots() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public TravelersBoots(IEventBus modEventBus, ModContainer modContainer) {
         ModItem.register(modEventBus);
-        MinecraftForge.EVENT_BUS.register(this);
-
         modEventBus.addListener(this::addCreative);
     }
 

@@ -1,79 +1,32 @@
 package net.iggnom.travelersboots.equipment;
 
-import com.google.common.base.Suppliers;
 import net.iggnom.travelersboots.TravelersBoots;
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.Util;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Supplier;
+import java.util.EnumMap;
+import java.util.List;
 
-public enum ModArmorMaterials implements ArmorMaterial {
-    TRAVELERSBOOTS("travelers_boots", 33, new int[] { 3, 6, 8, 3 }, 10, () -> SoundEvents.ARMOR_EQUIP_LEATHER, 2.0F, 0.0F, () -> Ingredient.of(Items.DIAMOND));
+public class ModArmorMaterials {
+    public static Holder<ArmorMaterial> TRAVELERS_BOOTS = register();
 
-    private static final int[] MAX_DAMAGE_ARRAY = new int[] { 13, 15, 16, 11 };
-    private final String name;
-    private final int maxDamageFactor;
-    private final int[] damageReductionAmountArray;
-    private final int enchantability;
-    private final Supplier<SoundEvent> soundEvent;
-    private final float toughness;
-    private final float knockbackResistance;
-    private final Supplier<Ingredient> repairMaterial;
-
-    ModArmorMaterials(String name, int maxDamageFactor, int[] damageReductionAmountArray, int enchantability,
-                      Supplier<SoundEvent> soundEvent, float toughness, float knockbackResistance, Supplier<Ingredient> repairMaterial) {
-        this.name = name;
-        this.maxDamageFactor = maxDamageFactor;
-        this.damageReductionAmountArray = damageReductionAmountArray;
-        this.enchantability = enchantability;
-        this.soundEvent = soundEvent;
-        this.toughness = toughness;
-        this.knockbackResistance = knockbackResistance;
-        this.repairMaterial = Suppliers.memoize(repairMaterial::get);
-    }
-
-    @Override
-    public int getDurabilityForType(ArmorItem.Type type) {
-        return MAX_DAMAGE_ARRAY[type.getSlot().getIndex()] * this.maxDamageFactor;
-    }
-
-    @Override
-    public int getDefenseForType(ArmorItem.Type type) {
-        return this.damageReductionAmountArray[type.getSlot().getIndex()];
-    }
-
-    @Override
-    public int getEnchantmentValue() {
-        return this.enchantability;
-    }
-
-    @Override
-    public @NotNull SoundEvent getEquipSound() {
-        return this.soundEvent.get();
-    }
-
-    @Override
-    public @NotNull Ingredient getRepairIngredient() {
-        return this.repairMaterial.get();
-    }
-
-    @Override
-    public @NotNull String getName() {
-        return TravelersBoots.MOD_ID + ":" + this.name;
-    }
-
-    @Override
-    public float getToughness() {
-        return this.toughness;
-    }
-
-    @Override
-    public float getKnockbackResistance() {
-        return this.knockbackResistance;
+    private static Holder<ArmorMaterial> register() {
+        ResourceLocation location = ResourceLocation.fromNamespaceAndPath(TravelersBoots.MOD_ID, "travelers_boots");
+        ArmorMaterial armorMaterial = new ArmorMaterial(
+                Util.make(new EnumMap<>(ArmorItem.Type.class), attribute -> attribute.put(ArmorItem.Type.BOOTS, 3)),
+                10,
+                SoundEvents.ARMOR_EQUIP_LEATHER,
+                () -> Ingredient.of(Items.DIAMOND),
+                List.of(new ArmorMaterial.Layer(location)),
+                2.0f, 0.0f);
+        return Registry.registerForHolder(BuiltInRegistries.ARMOR_MATERIAL, location, armorMaterial);
     }
 }

@@ -1,5 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "pattern": [
     "LGL",
     "FDF",
@@ -23,6 +24,7 @@
     }
   },
   "result": {
-    "item": "travelersboots:travelers_boots"
+    "count": 1,
+    "id": "travelersboots:travelers_boots"
   }
 }

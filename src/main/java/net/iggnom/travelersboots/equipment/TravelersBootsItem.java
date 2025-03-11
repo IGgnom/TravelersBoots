@@ -24,7 +24,7 @@ import java.util.List;
 
 public class TravelersBootsItem extends ArmorItem {
     public TravelersBootsItem(Holder<ArmorMaterial> material, Properties properties) {
-        super(material, Type.BOOTS, properties);
+        super(material, ArmorItem.Type.BOOTS, properties);
         NeoForge.EVENT_BUS.addListener(this::onLivingJump);
         NeoForge.EVENT_BUS.addListener(this::onLivingFall);
         NeoForge.EVENT_BUS.addListener(this::onPlayerTickPost);
@@ -50,8 +50,10 @@ public class TravelersBootsItem extends ArmorItem {
         Player player = event.getEntity();
         if (isWornBy(player)) {
             float speedModifier = 0f;
-            if (player.isSprinting())
+            if (player.isSprinting()) {
                 speedModifier = player.onGround() ? 0.084f : 0.020f;
+                player.getFoodData().addExhaustion(player.onGround() ? -0.015f : 0.0f);
+            }
             else if (player.zza > 0f)
                 speedModifier = player.onGround() ? 0.08f : 0.025f;
             speedModifier /= player.isInWater() ? 5f : 1f;

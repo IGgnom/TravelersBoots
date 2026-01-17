@@ -15,7 +15,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import org.jetbrains.annotations.NotNull;
 
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -25,17 +24,15 @@ import java.util.List;
 public class TravelersBootsItem extends ArmorItem {
     public TravelersBootsItem(Holder<ArmorMaterial> material, Properties properties) {
         super(material, ArmorItem.Type.BOOTS, properties);
-        NeoForge.EVENT_BUS.addListener(this::onLivingJump);
-        NeoForge.EVENT_BUS.addListener(this::onLivingFall);
-        NeoForge.EVENT_BUS.addListener(this::onPlayerTickPost);
-        NeoForge.EVENT_BUS.addListener(this::onPlayerTickPre);
     }
 
     public static final AttributeModifier STEP_HEIGHT_MODIFIER = new AttributeModifier(ResourceLocation.fromNamespaceAndPath(TravelersBoots.MOD_ID,
             "travelersbootsstepassist"), 0.5f, AttributeModifier.Operation.ADD_VALUE);
 
-    public void onPlayerTickPre(PlayerTickEvent.Pre event) {
+    public static void onPlayerTickPre(PlayerTickEvent.Pre event) {
         Player player = event.getEntity();
+        if (player.level().isClientSide())
+            return;
         if (isWornBy(player) && player.getAttribute(Attributes.STEP_HEIGHT) != null) {
             if (player.isCrouching())
                 player.getAttribute(Attributes.STEP_HEIGHT).removeModifier(STEP_HEIGHT_MODIFIER);
@@ -46,9 +43,9 @@ public class TravelersBootsItem extends ArmorItem {
             player.getAttribute(Attributes.STEP_HEIGHT).removeModifier(STEP_HEIGHT_MODIFIER);
     }
 
-    public void onPlayerTickPost(PlayerTickEvent.Post event) {
+    public static void onPlayerTickPost(PlayerTickEvent.Post event) {
         Player player = event.getEntity();
-        if (isWornBy(player)) {
+        if (isWornBy(player) && !player.isFallFlying()) {
             float speedModifier = 0f;
             if (player.isSprinting()) {
                 speedModifier = player.onGround() ? 0.084f : 0.020f;
@@ -62,13 +59,13 @@ public class TravelersBootsItem extends ArmorItem {
         }
     }
 
-    public void onLivingJump(LivingEvent.LivingJumpEvent event) {
+    public static void onLivingJump(LivingEvent.LivingJumpEvent event) {
         LivingEntity livingEntity = event.getEntity();
         if (isWornBy(livingEntity))
             livingEntity.setDeltaMovement(livingEntity.getDeltaMovement().add(0f, 0.265f, 0f));
     }
 
-    public void onLivingFall(LivingFallEvent event) {
+    public static void onLivingFall(LivingFallEvent event) {
         if (isWornBy(event.getEntity())) {
             if (event.getDistance() <= 5f)
                 event.setDamageMultiplier(0f);

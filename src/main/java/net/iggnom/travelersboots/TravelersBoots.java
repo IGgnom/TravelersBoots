@@ -1,5 +1,6 @@
 package net.iggnom.travelersboots;
 
+import net.iggnom.travelersboots.equipment.TravelersBootsItem;
 import net.iggnom.travelersboots.item.ModItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.common.MinecraftForge;
@@ -18,6 +19,14 @@ public class TravelersBoots {
         MinecraftForge.EVENT_BUS.register(this);
 
         modEventBus.addListener(this::addCreative);
+
+        registerEventHandlers();
+    }
+
+    private void registerEventHandlers() {
+        MinecraftForge.EVENT_BUS.addListener(TravelersBootsItem::onPlayerTick);
+        MinecraftForge.EVENT_BUS.addListener(TravelersBootsItem::onLivingJump);
+        MinecraftForge.EVENT_BUS.addListener(TravelersBootsItem::onLivingFall);
     }
 
     private void addCreative(BuildCreativeModeTabContentsEvent event) {

@@ -32,13 +32,10 @@ import java.util.UUID;
 public class TravelersBootsItem extends ArmorItem {
     public TravelersBootsItem(ArmorMaterial material, Properties properties) {
         super(material, Type.BOOTS, properties);
-        MinecraftForge.EVENT_BUS.addListener(this::onLivingJump);
-        MinecraftForge.EVENT_BUS.addListener(this::onLivingFall);
-        MinecraftForge.EVENT_BUS.addListener(this::onPlayerTick);
     }
 
-    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (isWornBy(event.player)) {
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (isWornBy(event.player) && !event.player.isFallFlying()) {
             float speedModifier = 0f;
             if (event.player.isSprinting())
                 speedModifier = event.player.onGround() ? 0.031f : 0.012f;
@@ -50,13 +47,13 @@ public class TravelersBootsItem extends ArmorItem {
         }
     }
 
-    public void onLivingJump(LivingEvent.LivingJumpEvent event) {
+    public static void onLivingJump(LivingEvent.LivingJumpEvent event) {
         LivingEntity livingEntity = event.getEntity();
         if (isWornBy(livingEntity))
             livingEntity.setDeltaMovement(livingEntity.getDeltaMovement().add(0f, 0.265f, 0f));
     }
 
-    public void onLivingFall(LivingFallEvent event) {
+    public static void onLivingFall(LivingFallEvent event) {
         if (isWornBy(event.getEntity())) {
             if (event.getDistance() <= 5f)
                 event.setDamageMultiplier(0f);

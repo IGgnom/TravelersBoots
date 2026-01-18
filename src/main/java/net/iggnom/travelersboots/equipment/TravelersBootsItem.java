@@ -19,9 +19,11 @@ import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
+
 import java.util.List;
 
-public class TravelersBootsItem extends ArmorItem {
+public class TravelersBootsItem extends ArmorItem implements ICurioItem {
     public TravelersBootsItem(Holder<ArmorMaterial> material, Properties properties) {
         super(material, ArmorItem.Type.BOOTS, properties);
     }

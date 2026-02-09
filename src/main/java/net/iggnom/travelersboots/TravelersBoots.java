@@ -1,8 +1,11 @@
 package net.iggnom.travelersboots;
 
+import net.iggnom.travelersboots.compat.Curios;
+import net.iggnom.travelersboots.compat.Mods;
 import net.iggnom.travelersboots.equipment.TravelersBootsItem;
 import net.iggnom.travelersboots.item.ModItem;
 import net.minecraft.world.item.CreativeModeTabs;
+
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -18,6 +21,8 @@ public class TravelersBoots {
         modEventBus.addListener(this::addCreative);
 
         registerEventHandlers();
+
+        Mods.CURIOS.executeIfInstalled(() -> () -> Curios.init(modEventBus));
     }
 
     private void registerEventHandlers() {
@@ -27,7 +32,7 @@ public class TravelersBoots {
         NeoForge.EVENT_BUS.addListener(TravelersBootsItem::onLivingFall);
     }
 
-    private void addCreative(BuildCreativeModeTabContentsEvent event) {
+    private void addCreative(final BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.COMBAT) {
             event.accept(ModItem.TRAVELERS_BOOTS_ITEM);
         }

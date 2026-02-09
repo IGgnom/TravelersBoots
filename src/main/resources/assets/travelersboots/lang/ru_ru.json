@@ -1,4 +1,5 @@
 {
   "item.travelersboots.travelers_boots": "Сапоги путешественника",
-  "tooltip.travelersboots.travelers_boots.tooltip": "Позволяют быстрее двигаться и выше прыгать"
+  "tooltip.travelersboots.travelers_boots.tooltip": "Позволяют быстрее двигаться, выше прыгать и ходить по рыхлому снегу",
+  "curios.identifier.travelers_boots": "Сапоги путешественника"
 }

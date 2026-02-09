@@ -1,6 +1,7 @@
 package net.iggnom.travelersboots.equipment;
 
 import net.iggnom.travelersboots.TravelersBoots;
+import net.iggnom.travelersboots.item.ModItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
@@ -19,17 +20,27 @@ import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
-import top.theillusivec4.curios.api.type.capability.ICurioItem;
-
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
-public class TravelersBootsItem extends ArmorItem implements ICurioItem {
+public class TravelersBootsItem extends ArmorItem {
     public TravelersBootsItem(Holder<ArmorMaterial> material, Properties properties) {
         super(material, ArmorItem.Type.BOOTS, properties);
     }
 
     public static final AttributeModifier STEP_HEIGHT_MODIFIER = new AttributeModifier(ResourceLocation.fromNamespaceAndPath(TravelersBoots.MOD_ID,
             "travelersbootsstepassist"), 0.5f, AttributeModifier.Operation.ADD_VALUE);
+
+    private static final List<Predicate<Player>> IS_WEARING_PREDICATES = new ArrayList<>();
+
+    static {
+        addIsWearingPredicate(player -> player.getItemBySlot(EquipmentSlot.FEET).getItem() instanceof TravelersBootsItem);
+    }
+
+    public static synchronized void addIsWearingPredicate(Predicate<Player> predicate) {
+        IS_WEARING_PREDICATES.add(predicate);
+    }
 
     public static void onPlayerTickPre(PlayerTickEvent.Pre event) {
         Player player = event.getEntity();
@@ -77,9 +88,19 @@ public class TravelersBootsItem extends ArmorItem implements ICurioItem {
     }
 
     public static boolean isWornBy(Entity entity) {
-        if (!(entity instanceof LivingEntity livingEntity))
+        if (!(entity instanceof Player player))
             return false;
-        return livingEntity.getItemBySlot(EquipmentSlot.FEET).getItem() instanceof TravelersBootsItem;
+        for (Predicate<Player> predicate : IS_WEARING_PREDICATES) {
+            if (predicate.test(player)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean canWalkOnPowderedSnow(ItemStack stack, @NotNull LivingEntity wearer) {
+        return stack.is(ModItem.TRAVELERS_BOOTS_ITEM);
     }
 
     @Override

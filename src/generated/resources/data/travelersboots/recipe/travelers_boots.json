@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "D": "minecraft:diamond_boots",
+    "F": "minecraft:feather",
+    "G": "minecraft:green_wool",
+    "I": "minecraft:iron_ingot",
+    "L": "minecraft:leather"
+  },
+  "pattern": [
+    "LGL",
+    "FDF",
+    "LIL"
+  ],
+  "result": {
+    "id": "travelersboots:travelers_boots"
+  }
+}

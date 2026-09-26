@@ -3,9 +3,8 @@ package net.iggnom.travelersboots.equipment;
 import net.iggnom.travelersboots.TravelersBoots;
 import net.iggnom.travelersboots.item.ModItem;
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -13,23 +12,28 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import org.jetbrains.annotations.NotNull;
 
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import org.jspecify.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class TravelersBootsItem extends ArmorItem {
-    public TravelersBootsItem(Holder<ArmorMaterial> material, Properties properties) {
-        super(material, ArmorItem.Type.BOOTS, properties);
+public class TravelersBootsItem extends Item {
+    public TravelersBootsItem(Properties properties) {
+        super(properties);
     }
 
-    public static final AttributeModifier STEP_HEIGHT_MODIFIER = new AttributeModifier(ResourceLocation.fromNamespaceAndPath(TravelersBoots.MOD_ID,
+    public static final AttributeModifier STEP_HEIGHT_MODIFIER = new AttributeModifier(Identifier.fromNamespaceAndPath(TravelersBoots.MOD_ID,
             "travelersbootsstepassist"), 0.5f, AttributeModifier.Operation.ADD_VALUE);
 
     private static final List<Predicate<Player>> IS_WEARING_PREDICATES = new ArrayList<>();
@@ -104,8 +108,8 @@ public class TravelersBootsItem extends ArmorItem {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("tooltip.travelersboots.travelers_boots.tooltip").withStyle(ChatFormatting.GOLD));
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+    public void appendHoverText(@NonNull ItemStack stack, @NonNull TooltipContext context, @NonNull TooltipDisplay display, @NonNull Consumer<Component> builder, @NotNull TooltipFlag tooltipFlag) {
+        builder.accept(Component.translatable("tooltip.travelersboots.travelers_boots.tooltip").withStyle(ChatFormatting.GOLD));
+        super.appendHoverText(stack, context, display, builder, tooltipFlag);
     }
 }

@@ -1,5 +1,6 @@
 package net.iggnom.travelersboots.compat;
 
+import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.LoadingModList;
 
 import java.util.function.Supplier;
@@ -11,7 +12,7 @@ public enum Mods {
 
     Mods() {
         String id = name().toLowerCase();
-        isLoaded = LoadingModList.get().getModFileById(id) != null;
+        isLoaded = FMLLoader.getCurrent().getLoadingModList().getModFileById(id) != null;
     }
 
     public boolean isLoaded() {

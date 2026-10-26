@@ -10,6 +10,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
@@ -32,6 +33,16 @@ public class TravelersBootsItem extends ArmorItem {
     public static final AttributeModifier STEP_HEIGHT_MODIFIER = new AttributeModifier(ResourceLocation.fromNamespaceAndPath(TravelersBoots.MOD_ID,
             "travelersbootsstepassist"), 0.5f, AttributeModifier.Operation.ADD_VALUE);
 
+    private static final float SPRINT_GROUND_SPEED_BOOST = 0.084f;
+    private static final float SPRINT_AIR_SPEED_BOOST = 0.020f;
+    private static final float WALK_GROUND_SPEED_BOOST = 0.08f;
+    private static final float WALK_AIR_SPEED_BOOST = 0.025f;
+    private static final float WATER_SPEED_DIVISOR = 5f;
+    private static final float SPRINT_EXHAUSTION_CANCEL_PER_BLOCK = 0.05f;
+    private static final float JUMP_BOOST = 0.265f;
+    private static final float SAFE_FALL_DISTANCE = 5f;
+    private static final float HARD_FALL_DAMAGE_MULTIPLIER = 0.5f;
+
     private static final List<Predicate<Player>> IS_WEARING_PREDICATES = new ArrayList<>();
 
     static {
@@ -46,14 +57,16 @@ public class TravelersBootsItem extends ArmorItem {
         Player player = event.getEntity();
         if (player.level().isClientSide())
             return;
-        if (isWornBy(player) && player.getAttribute(Attributes.STEP_HEIGHT) != null) {
-            if (player.isCrouching())
-                player.getAttribute(Attributes.STEP_HEIGHT).removeModifier(STEP_HEIGHT_MODIFIER);
+        AttributeInstance stepHeight = player.getAttribute(Attributes.STEP_HEIGHT);
+        if (stepHeight == null)
+            return;
+        boolean active = isWornBy(player) && !player.isCrouching();
+        if (active != stepHeight.hasModifier(STEP_HEIGHT_MODIFIER.id())) {
+            if (active)
+                stepHeight.addTransientModifier(STEP_HEIGHT_MODIFIER);
             else
-                player.getAttribute(Attributes.STEP_HEIGHT).addOrUpdateTransientModifier(STEP_HEIGHT_MODIFIER);
+                stepHeight.removeModifier(STEP_HEIGHT_MODIFIER);
         }
-        else
-            player.getAttribute(Attributes.STEP_HEIGHT).removeModifier(STEP_HEIGHT_MODIFIER);
     }
 
     public static void onPlayerTickPost(PlayerTickEvent.Post event) {
@@ -61,12 +74,16 @@ public class TravelersBootsItem extends ArmorItem {
         if (isWornBy(player) && !player.isFallFlying()) {
             float speedModifier = 0f;
             if (player.isSprinting()) {
-                speedModifier = player.onGround() ? 0.084f : 0.020f;
-                player.getFoodData().addExhaustion(player.onGround() ? -0.015f : 0.0f);
+                speedModifier = player.onGround() ? SPRINT_GROUND_SPEED_BOOST : SPRINT_AIR_SPEED_BOOST;
+                if (player.onGround()) {
+                    float dx = (float) (player.getX() - player.xo);
+                    float dz = (float) (player.getZ() - player.zo);
+                    player.causeFoodExhaustion(-SPRINT_EXHAUSTION_CANCEL_PER_BLOCK * Mth.sqrt(dx * dx + dz * dz));
+                }
             }
             else if (player.zza > 0f)
-                speedModifier = player.onGround() ? 0.08f : 0.025f;
-            speedModifier /= player.isInWater() ? 5f : 1f;
+                speedModifier = player.onGround() ? WALK_GROUND_SPEED_BOOST : WALK_AIR_SPEED_BOOST;
+            speedModifier /= player.isInWater() ? WATER_SPEED_DIVISOR : 1f;
             float rotation = Mth.PI / 180f * player.getYRot();
             player.setDeltaMovement(player.getDeltaMovement().add(-Mth.sin(rotation) * speedModifier, 0f, Mth.cos(rotation) * speedModifier));
         }
@@ -75,15 +92,15 @@ public class TravelersBootsItem extends ArmorItem {
     public static void onLivingJump(LivingEvent.LivingJumpEvent event) {
         LivingEntity livingEntity = event.getEntity();
         if (isWornBy(livingEntity))
-            livingEntity.setDeltaMovement(livingEntity.getDeltaMovement().add(0f, 0.265f, 0f));
+            livingEntity.setDeltaMovement(livingEntity.getDeltaMovement().add(0f, JUMP_BOOST, 0f));
     }
 
     public static void onLivingFall(LivingFallEvent event) {
         if (isWornBy(event.getEntity())) {
-            if (event.getDistance() <= 5f)
+            if (event.getDistance() <= SAFE_FALL_DISTANCE)
                 event.setDamageMultiplier(0f);
             else
-                event.setDamageMultiplier(event.getDamageMultiplier() * 0.5f);
+                event.setDamageMultiplier(event.getDamageMultiplier() * HARD_FALL_DAMAGE_MULTIPLIER);
         }
     }
 
@@ -105,7 +122,7 @@ public class TravelersBootsItem extends ArmorItem {
 
     @Override
     public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
-        tooltipComponents.add(Component.translatable("tooltip.travelersboots.travelers_boots.tooltip").withStyle(ChatFormatting.GOLD));
+        tooltipComponents.add(Component.translatable("tooltip.travelersboots.travelers_boots").withStyle(ChatFormatting.GOLD));
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
 }

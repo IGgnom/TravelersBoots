@@ -1,4 +1,4 @@
-package net.iggnom.travelersboots.compat;
+package net.iggnom.travelersboots.compat.curios;
 
 import net.iggnom.travelersboots.equipment.TravelersBootsItem;
 import net.iggnom.travelersboots.item.ModItem;

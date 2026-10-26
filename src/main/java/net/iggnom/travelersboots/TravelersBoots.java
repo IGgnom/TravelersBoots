@@ -1,6 +1,6 @@
 package net.iggnom.travelersboots;
 
-import net.iggnom.travelersboots.compat.Curios;
+import net.iggnom.travelersboots.compat.curios.Curios;
 import net.iggnom.travelersboots.compat.Mods;
 import net.iggnom.travelersboots.equipment.TravelersBootsItem;
 import net.iggnom.travelersboots.item.ModItem;
